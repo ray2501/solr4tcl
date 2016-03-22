@@ -41,14 +41,23 @@ package provide solr4tcl 0.1
 #
 oo::class create Solr_Request {
     variable server
+    variable ssl_enabled
     variable path
     variable solr_writer
 
-    constructor {SERVER} {
+    constructor {SERVER {SSL_ENABLED 0}} {
         set server $SERVER
         set path ""
-
-	    set solr_writer "xml"
+        set ssl_enabled $SSL_ENABLED
+        set solr_writer "xml"
+        
+        if {$ssl_enabled} {
+            if {[catch {package require tls}]==0} {
+                http::register https 443 [list ::tls::socket -ssl3 0 -ssl2 0 -tls1 1]
+            } else {
+                error "SSL_ENABLED needs package tls..."
+            }
+        }
     }
 
     destructor {
@@ -80,7 +89,7 @@ oo::class create Solr_Request {
             }
         }
 
-        if {[string compare -nocase $method "HEAD"] == 1} {
+        if {[string compare -nocase $method "HEAD"] != 0} {
             set res [http::data $tok]
         } else {
             set res [http::status $tok]
