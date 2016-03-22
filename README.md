@@ -97,3 +97,13 @@ Now try to search something:
     set res [$solrresquest search "ipod"]
     # print the search result
     puts $res
+
+## HTTPS support
+
+If user enables HTTPS support, below is an example:
+
+    package require solr4tcl
+    
+    set solrresquest [Solr_Request new "https://localhost:8983" 1]
+
+Please notice, I use [TLS extension] (http://tls.sourceforge.net/) to add https support. So https support needs TLS extension.
