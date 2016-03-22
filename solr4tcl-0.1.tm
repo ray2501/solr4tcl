@@ -308,7 +308,7 @@ oo::class create Solr_Request {
             append myurl "/$path/update/extract?$querystring"
         }
 
-        set headerl [list Content-Type "text/xml; charset=UTF-8"]
+        set headerl [list Content-Type "application/x-www-form-urlencoded"]
         set res [my send_request $myurl POST $headerl $fileContent]
 
         return $res
