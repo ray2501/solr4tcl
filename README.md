@@ -2,8 +2,8 @@
 solr4tcl
 =====
 
-A [Tcl] (http://tcl.tk) lightweight client interface to Apache Solr. The library consists of a single
-[Tcl Module] (http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file.
+A [Tcl] (http://tcl.tk) lightweight client interface to [Apache Solr] (http://lucene.apache.org/solr/).
+The library consists of a single [Tcl Module] (http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file.
 
 solr4tcl is using  Tcl built-in package http to send request
 to [Aapache Solr] (http://lucene.apache.org/solr/) and get response.
@@ -57,7 +57,7 @@ Below is an example to upload example docs:
     }
 
     # setup example docs folder
-    set folder "c:/solr-5.5.0/example/exampledocs"
+    set folder "/home/danilo/Programs/solr-5.5.0/example/exampledocs"
 
     foreach file [glob -directory $folder -types f *.xml] {
         set size [file size $file]
