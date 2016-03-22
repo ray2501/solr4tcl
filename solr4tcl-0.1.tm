@@ -2,7 +2,7 @@
 #
 #	A lightweight Tcl client interface to Apache Solr
 #
-# Copyright (C) 2015 Danilo Chang <ray2501@gmail.com>
+# Copyright (C) 2015-2016 Danilo Chang <ray2501@gmail.com>
 #
 # Retcltribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -50,7 +50,7 @@ oo::class create Solr_Request {
         set path ""
         set ssl_enabled $SSL_ENABLED
         set solr_writer "xml"
-        
+
         if {$ssl_enabled} {
             if {[catch {package require tls}]==0} {
                 http::register https 443 [list ::tls::socket -ssl3 0 -ssl2 0 -tls1 1]
@@ -289,7 +289,7 @@ oo::class create Solr_Request {
     }
 
     #
-    #  Uploading Data by using Apache Tika
+    #  Uploading Data with solr by using Apache Tika
     #
     method upload {fileContent {FILENAME ""} {COMMIT true} {ExtractOnly false} {params ""}} {
         set myurl "$server/solr"
@@ -308,7 +308,18 @@ oo::class create Solr_Request {
             append myurl "/$path/update/extract?$querystring"
         }
 
-        set headerl [list Content-Type "application/octet-stream"]
+        set ext [file extension $FILENAME]
+        set ext [string tolower $ext]
+
+        if {[string compare ".xml" $ext] == 0} {
+          set headerl [list Content-Type "text/xml; charset=UTF-8"]
+        } elseif {[string compare ".json" $ext] == 0} {
+          set headerl [list Content-Type "text/json; charset=UTF-8"]
+        } elseif {[string compare ".csv" $ext] == 0} {
+          set headerl [list Content-Type "text/csv; charset=UTF-8"]
+        } else {
+          set headerl [list Content-Type "application/octet-stream"]
+        }
         set res [my send_request $myurl POST $headerl $fileContent]
 
         return $res
