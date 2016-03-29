@@ -391,10 +391,13 @@ oo::class create Solr_Request {
     method import-status {} {
         set myurl "$server/solr"
 
+        set params [list command status]
+        set querystring [http::formatQuery {*}$params]
+
         if {[string length $path] < 1} {
-            append myurl "/dataimport"
+            append myurl "/dataimport?$querystring"
         } else {
-            append myurl "/$path/dataimport"
+            append myurl "/$path/dataimport?$querystring"
         }
 
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
