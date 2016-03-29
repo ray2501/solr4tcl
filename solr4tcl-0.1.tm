@@ -324,4 +324,82 @@ oo::class create Solr_Request {
 
         return $res
     }
+
+    #
+    # clean default is 'true':
+    # clean tells whether to clean up the index before the indexing is started.
+    #
+    method full-import {{CLEAN true}} {
+        set myurl "$server/solr"
+
+        set params [list command full-import]
+        lappend params clean $CLEAN
+        set querystring [http::formatQuery {*}$params]
+
+        if {[string length $path] < 1} {
+            append myurl "/dataimport?$querystring"
+        } else {
+            append myurl "/$path/dataimport?$querystring"
+        }
+
+        set headerl [list Content-Type "text/xml; charset=UTF-8"]
+        set res [my send_request $myurl GET $headerl]
+        return $res
+    }
+
+    #
+    # clean default is 'true':
+    # clean tells whether to clean up the index before the indexing is started.
+    #
+    method delta-import {{CLEAN true}} {
+        set myurl "$server/solr"
+
+        set params [list command delta-import]
+        lappend params clean $CLEAN
+        set querystring [http::formatQuery {*}$params]
+
+        if {[string length $path] < 1} {
+            append myurl "/dataimport?$querystring"
+        } else {
+            append myurl "/$path/dataimport?$querystring"
+        }
+
+        set headerl [list Content-Type "text/xml; charset=UTF-8"]
+        set res [my send_request $myurl GET $headerl]
+
+        return $res
+    }
+
+    method abort-import {} {
+        set myurl "$server/solr"
+
+        set params [list command abort]
+        set querystring [http::formatQuery {*}$params]
+
+        if {[string length $path] < 1} {
+            append myurl "/dataimport?$querystring"
+        } else {
+            append myurl "/$path/dataimport?$querystring"
+        }
+
+        set headerl [list Content-Type "text/xml; charset=UTF-8"]
+        set res [my send_request $myurl GET $headerl]
+
+        return $res
+    }
+
+    method import-status {} {
+        set myurl "$server/solr"
+
+        if {[string length $path] < 1} {
+            append myurl "/dataimport"
+        } else {
+            append myurl "/$path/dataimport"
+        }
+
+        set headerl [list Content-Type "text/xml; charset=UTF-8"]
+        set res [my send_request $myurl GET $headerl]
+
+        return $res
+    }
 }
