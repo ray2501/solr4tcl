@@ -98,6 +98,41 @@ Now try to search something:
     # print the search result
     puts $res
 
+The Data Import Handler (DIH) provides a mechanism for importing content
+from a data store and indexing it.
+
+Below is an example to invoke full-import command and
+check status:
+
+    package require solr4tcl
+    package require tdom
+
+    set solrresquest [Solr_Request new "https://localhost:8984" 1]
+    $solrresquest setDocumentPath monetdb
+
+    $solrresquest setSolrWriter xml
+
+    # do a full import
+    $solrresquest full-import
+
+    # Check import status
+    set res [$solrresquest import-status]
+    set doc [dom parse $res]
+    set root [$doc documentElement]
+    set nodeList [$root selectNodes {/response/lst/lst/str}]
+    foreach node $nodeList {
+        set attr [$node getAttribute name]
+        set number [$node text]
+        puts "$attr: $number"
+    }
+
+    set nodeList [$root selectNodes {/response/lst/str[@name]}]
+    foreach node $nodeList {
+        set attr [$node getAttribute name]
+        set number [$node text]
+        puts "$attr $number"
+    }
+
 ## HTTPS support
 
 If user enables HTTPS support, below is an example:
