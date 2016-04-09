@@ -405,4 +405,27 @@ oo::class create Solr_Request {
 
         return $res
     }
+
+    #
+    # Apache Solr 6.0 added support for executing Parallel SQL queries across
+    # SolrCloud collections.
+    # Currently works in SolrCloud mode only… no standalone mode yet.
+    #
+    method sql {QUERY} {
+        set myurl "$server/solr"
+
+        set params [list stmt $QUERY]
+        set querystring [http::formatQuery {*}$params]
+
+        if {[string length $path] < 1} {
+            append myurl "/sql?$querystring"
+        } else {
+            append myurl "/$path/sql?$querystring"
+        }
+
+        set headerl [list Content-Type "text/xml; charset=UTF-8"]
+        set res [my send_request $myurl GET $headerl]
+
+        return $res
+    }
 }
