@@ -139,6 +139,6 @@ If user enables HTTPS support, below is an example:
 
     package require solr4tcl
     
-    set solrresquest [Solr_Request new "https://localhost:8983" 1]
+    set solrresquest [Solr_Request new "https://localhost:8984" 1]
 
 Please notice, I use [TLS extension] (http://tls.sourceforge.net/) to add https support. So https support needs TLS extension.
