@@ -57,9 +57,45 @@ Below is an example to upload example docs:
     }
 
     # setup example docs folder
-    set folder "/home/danilo/Programs/solr-5.5.0/example/exampledocs"
+    set folder "/home/danilo/Programs/solr-6.0.0/example/exampledocs"
 
     foreach file [glob -directory $folder -types f *.xml] {
+        set size [file size $file]
+        set fd [open $file {RDWR BINARY}]
+        fconfigure $fd -blocking 1 -encoding binary -translation binary
+        set data [read $fd $size]
+        close $fd
+
+        set res [$solrresquest upload $data $file]
+        puts $res
+    }
+
+    # Commit and Optimize Operations
+    set res [$solrresquest commit]
+    puts $res
+
+    set res [$solrresquest optimize]
+    puts $res
+
+Below is an example to upload example docs (via SSL, JSON files):
+
+    package require solr4tcl
+
+    set solrresquest [Solr_Request new "https://localhost:8984" 1]
+    $solrresquest setDocumentPath mycollection
+    $solrresquest setSolrWriter xml
+
+    set res [$solrresquest ping]
+    if {[string compare -nocase $res "ok"]!=0} {
+        puts "Apache Solr server returns not OK, close."
+        exit
+    }
+
+    # setup example docs folder
+    set folder "/home/danilo/Programs/solr-6.0.0/example/exampledocs"
+
+    foreach file [glob -directory $folder -types f *.json] {
+    puts $file
         set size [file size $file]
         set fd [open $file {RDWR BINARY}]
         fconfigure $fd -blocking 1 -encoding binary -translation binary
