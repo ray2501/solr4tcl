@@ -177,3 +177,52 @@ If user enables HTTPS support, below is an example:
     set solrresquest [Solr_Request new "https://localhost:8984" 1]
 
 Please notice, I use [TLS extension] (http://tls.sourceforge.net/) to add https support. So https support needs TLS extension.
+
+## Basic Authentication support
+
+This function requires tcllib base64 package.
+
+If user `Basic Authentication` enables support, below is an example to update user `solr`
+default password `SolrRocks`:
+
+    package require solr4tcl
+
+    set solrresquest [Solr_Request new "https://localhost:8984" 1]
+    $solrresquest setDocumentPath monetdb
+
+    $solrresquest setSolrWriter xml
+    $solrresquest setAuthType "basic"
+    $solrresquest setUsername "solr"
+    $solrresquest setPassword "SolrRocks"
+
+    set res [$solrresquest ping]
+    if {[string compare -nocase $res "ok"]!=0} {
+        puts "Apache Solr server returns not OK, close."
+        exit
+    }
+
+    set res [$solrresquest authentication {{"set-user": {"solr" : "Solr6Rocks"}}}]
+    puts $res
+
+And test it:
+
+    package require solr4tcl
+
+    set solrresquest [Solr_Request new "https://localhost:8984" 1]
+    $solrresquest setDocumentPath monetdb
+
+    # support xml, json or csv
+    $solrresquest setSolrWriter xml
+    $solrresquest setAuthType "basic"
+    $solrresquest setUsername "solr"
+    $solrresquest setPassword "Solr6Rocks"
+
+    set res [$solrresquest ping]
+    if {[string compare -nocase $res "ok"]!=0} {
+        puts "Apache Solr server returns not OK, close."
+        exit
+    }
+
+    set res [$solrresquest search "product"]
+    puts $res
+

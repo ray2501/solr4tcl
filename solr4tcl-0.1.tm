@@ -32,6 +32,7 @@ package require Tcl 8.6
 package require TclOO
 package require http
 package require tdom
+package require base64
 
 package provide solr4tcl 0.1
 
@@ -44,12 +45,18 @@ oo::class create Solr_Request {
     variable ssl_enabled
     variable path
     variable solr_writer
+    variable authtype
+    variable username
+    variable password
 
     constructor {SERVER {SSL_ENABLED 0}} {
         set server $SERVER
         set path ""
         set ssl_enabled $SSL_ENABLED
         set solr_writer "xml"
+        set authtype "no"
+        set username ""
+        set password ""
 
         if {$ssl_enabled} {
             if {[catch {package require tls}]==0} {
@@ -67,6 +74,19 @@ oo::class create Solr_Request {
         set path $PATH
     }
 
+    method setAuthType {AUTHTYPE} {
+        # setup to "no" or "basic"
+        set authtype $AUTHTYPE
+    }
+
+    method setUsername {USERNAME} {
+        set username $USERNAME
+    }
+
+    method setPassword {PASSWORD} {
+        set password $PASSWORD
+    }
+
     #
     # support type: xml, json and cvs
     #
@@ -76,6 +96,11 @@ oo::class create Solr_Request {
 
     method send_request {url method {headers ""} {data ""}} {
         variable tok
+
+        if {[string compare -nocase $authtype "basic"]==0} {
+            set auth "Basic [base64::encode $username:$password]"
+            lappend headers Authorization $auth
+        }
 
         if {[string length $data] < 1} {
             if {[catch {set tok [http::geturl $url -method $method \
@@ -402,6 +427,19 @@ oo::class create Solr_Request {
 
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl GET $headerl]
+
+        return $res
+    }
+
+    #
+    # An Authentication API allows modifying user IDs and passwords.
+    #
+    method authentication {JSON_STRING} {
+        set myurl "$server/solr"
+        append myurl "/admin/authentication"
+
+        set headerl [list Content-Type "application/json"]
+        set res [my send_request $myurl POST $headerl $JSON_STRING]
 
         return $res
     }
