@@ -95,7 +95,6 @@ Below is an example to upload example docs (via SSL, JSON files):
     set folder "/home/danilo/Programs/solr-6.0.0/example/exampledocs"
 
     foreach file [glob -directory $folder -types f *.json] {
-    puts $file
         set size [file size $file]
         set fd [open $file {RDWR BINARY}]
         fconfigure $fd -blocking 1 -encoding binary -translation binary
