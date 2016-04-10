@@ -407,6 +407,24 @@ oo::class create Solr_Request {
     }
 
     #
+    # List Collections - only works in SolrCloud mode
+    #
+    method list-collections {} {
+        set myurl "$server/solr"
+
+        set params [list action LIST]
+        lappend params wt $solr_writer
+        set querystring [http::formatQuery {*}$params]
+
+        append myurl "/admin/collections?$querystring"
+
+        set headerl [list Content-Type "text/xml; charset=UTF-8"]
+        set res [my send_request $myurl GET $headerl]
+
+        return $res
+    }
+
+    #
     # Apache Solr 6.0 added support for executing Parallel SQL queries across
     # SolrCloud collections.
     # Currently works in SolrCloud mode only… no standalone mode yet.
