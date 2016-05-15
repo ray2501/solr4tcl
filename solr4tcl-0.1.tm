@@ -48,6 +48,7 @@ oo::class create Solr_Request {
     variable authtype
     variable username
     variable password
+    variable response
 
     constructor {SERVER {SSL_ENABLED 0}} {
         set server $SERVER
@@ -57,6 +58,7 @@ oo::class create Solr_Request {
         set authtype "no"
         set username ""
         set password ""
+        set response ""
 
         if {$ssl_enabled} {
             if {[catch {package require tls}]==0} {
@@ -114,11 +116,8 @@ oo::class create Solr_Request {
             }
         }
 
-        if {[string compare -nocase $method "HEAD"] != 0} {
-            set res [http::data $tok]
-        } else {
-            set res [http::status $tok]
-        }
+        set res [http::status $tok]
+        set [namespace current]::response [http::data $tok]
 
         http::cleanup $tok
         return $res
@@ -128,6 +127,7 @@ oo::class create Solr_Request {
     # Call the /admin/ping servlet
     #
     method ping {} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         if {[string length $path] < 1} {
@@ -146,6 +146,7 @@ oo::class create Solr_Request {
     # params is a list, give this funcition name-value pair parameter
     #
     method search {query {offset 0} {limit 10} {params ""}} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         if {[string length $path] < 1} {
@@ -166,13 +167,15 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "application/x-www-form-urlencoded; charset=UTF-8"]
         set res [my send_request $myurl POST $headerl $querystring]
 
-        return $res
+        return $response
     }
 
     #
     # parameters - a list include key-value pair
     #
     method add {parameters {OVERWRITE true} {BOOST "1.0"} {COMMIT true}} {
+        set [namespace current]::response ""
+
         # Try to build our XML document
         set doc [dom createDocument add]
 
@@ -205,13 +208,14 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl POST $headerl $myaddString]
 
-        return $res
+        return $response
     }
 
     #
     # xmldata - xml data string want to add
     #
     method addData {xmldata {COMMIT true}} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         set params [list commit $COMMIT]
@@ -226,7 +230,7 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl POST $headerl $xmldata]
 
-        return $res
+        return $response
     }
 
     #
@@ -234,6 +238,7 @@ oo::class create Solr_Request {
     # commit to one or more segment files on the disk
     #
     method commit {{WAITSEARCHER true} {EXPUNGEDELETES false}} {
+        set [namespace current]::response ""
         set mycommitString "<commit waitSearcher=\"$WAITSEARCHER\" expungeDeletes=\"$EXPUNGEDELETES\"/>"
         set myurl "$server/solr"
 
@@ -246,7 +251,7 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl POST $headerl $mycommitString]
 
-        return $res
+        return $response
     }
 
     #
@@ -254,6 +259,7 @@ oo::class create Solr_Request {
     # in order to improve search performance.
     #
     method optimize {{WAITSEARCHER true} {MAXSegments 1}} {
+        set [namespace current]::response ""
         set myoptimizeString "<optimize waitSearcher=\"$WAITSEARCHER\" maxSegments=\"$MAXSegments\"/>"
         set myurl "$server/solr"
 
@@ -266,13 +272,14 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl POST $headerl $myoptimizeString]
 
-        return $res
+        return $response
     }
 
     #
     #  "Delete by ID" deletes the document with the specified ID
     #
     method deleteById {ID {COMMIT true}} {
+        set [namespace current]::response ""
         set mydeleteString "<delete><id>$ID</id></delete>"
         set myurl "$server/solr"
 
@@ -288,13 +295,14 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl POST $headerl $mydeleteString]
 
-        return $res
+        return $response
     }
 
     #
     #  "Delete by Query" deletes all documents matching a specified query
     #
     method deleteByQuery {QUERY {COMMIT true}} {
+        set [namespace current]::response ""
         set mydeleteString "<delete><query>$QUERY</query></delete>"
         set myurl "$server/solr"
 
@@ -310,13 +318,14 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl POST $headerl $mydeleteString]
 
-        return $res
+        return $response
     }
 
     #
     #  Uploading Data with solr by using Apache Tika
     #
     method upload {fileContent {FILENAME ""} {COMMIT true} {ExtractOnly false} {params ""}} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         lappend params commit $COMMIT extractOnly $ExtractOnly
@@ -347,7 +356,7 @@ oo::class create Solr_Request {
         }
         set res [my send_request $myurl POST $headerl $fileContent]
 
-        return $res
+        return $response
     }
 
     #
@@ -355,6 +364,7 @@ oo::class create Solr_Request {
     # clean tells whether to clean up the index before the indexing is started.
     #
     method full-import {{CLEAN true}} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         set params [list command full-import]
@@ -369,7 +379,7 @@ oo::class create Solr_Request {
 
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl GET $headerl]
-        return $res
+        return $response
     }
 
     #
@@ -377,6 +387,7 @@ oo::class create Solr_Request {
     # clean tells whether to clean up the index before the indexing is started.
     #
     method delta-import {{CLEAN true}} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         set params [list command delta-import]
@@ -392,10 +403,11 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl GET $headerl]
 
-        return $res
+        return $response
     }
 
     method abort-import {} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         set params [list command abort]
@@ -410,10 +422,11 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl GET $headerl]
 
-        return $res
+        return $response
     }
 
     method import-status {} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         set params [list command status]
@@ -428,26 +441,28 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl GET $headerl]
 
-        return $res
+        return $response
     }
 
     #
     # An Authentication API allows modifying user IDs and passwords.
     #
     method authentication {JSON_STRING} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
         append myurl "/admin/authentication"
 
         set headerl [list Content-Type "application/json"]
         set res [my send_request $myurl POST $headerl $JSON_STRING]
 
-        return $res
+        return $response
     }
 
     #
     # List Collections - only works in SolrCloud mode
     #
     method list-collections {} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         set params [list action LIST]
@@ -459,7 +474,7 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl GET $headerl]
 
-        return $res
+        return $response
     }
 
     #
@@ -468,6 +483,7 @@ oo::class create Solr_Request {
     # Currently works in SolrCloud mode only… no standalone mode yet.
     #
     method sql {QUERY} {
+        set [namespace current]::response ""
         set myurl "$server/solr"
 
         set params [list stmt $QUERY]
@@ -482,6 +498,6 @@ oo::class create Solr_Request {
         set headerl [list Content-Type "text/xml; charset=UTF-8"]
         set res [my send_request $myurl GET $headerl]
 
-        return $res
+        return $response
     }
 }
