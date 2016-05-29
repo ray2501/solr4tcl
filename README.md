@@ -57,7 +57,7 @@ Below is an example to upload example docs:
     }
 
     # setup example docs folder
-    set folder "/home/danilo/Programs/solr-6.0.0/example/exampledocs"
+    set folder "/home/danilo/Programs/solr-6.0.1/example/exampledocs"
 
     foreach file [glob -directory $folder -types f *.xml] {
         set size [file size $file]
@@ -92,7 +92,7 @@ Below is an example to upload example docs (via SSL, JSON files):
     }
 
     # setup example docs folder
-    set folder "/home/danilo/Programs/solr-6.0.0/example/exampledocs"
+    set folder "/home/danilo/Programs/solr-6.0.1/example/exampledocs"
 
     foreach file [glob -directory $folder -types f *.json] {
         set size [file size $file]
@@ -224,5 +224,33 @@ And test it:
     }
 
     set res [$solrresquest search "product"]
+    puts $res
+
+## Parallel SQL
+
+Apache Solr 6.0 added support for executing Parallel SQL queries
+across SolrCloud collections. Tables in the SQL query map directly
+to SolrCloud collections.
+
+Below is an example:
+
+    package require solr4tcl
+
+    set solrresquest [Solr_Request new "https://localhost:8984" 1]
+    $solrresquest setDocumentPath mycollection
+
+    $solrresquest setSolrWriter xml
+    $solrresquest setAuthType "basic"
+    $solrresquest setUsername "solr"
+    $solrresquest setPassword "Solr6Rocks"
+
+    set res [$solrresquest ping]
+    if {[string compare -nocase $res "ok"]!=0} {
+        puts "Apache Solr server returns not OK, close."
+        exit
+    }
+
+    set res [$solrresquest sql "select id from mycollection"]
+    # output format now only support JSON, even setup writer to xml
     puts $res
 
