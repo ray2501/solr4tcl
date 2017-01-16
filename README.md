@@ -57,7 +57,7 @@ Below is an example to upload example docs:
     }
 
     # setup example docs folder
-    set folder "/home/danilo/Programs/solr-6.0.1/example/exampledocs"
+    set folder "/home/danilo/Programs/solr-6.3.0/example/exampledocs"
 
     foreach file [glob -directory $folder -types f *.xml] {
         set size [file size $file]
@@ -66,6 +66,7 @@ Below is an example to upload example docs:
         set data [read $fd $size]
         close $fd
 
+        # Notice: we give Solr the path to record
         set res [$solrresquest upload $data $file]
         puts $res
     }
@@ -77,7 +78,7 @@ Below is an example to upload example docs:
     set res [$solrresquest optimize]
     puts $res
 
-Below is an example to upload example docs (via SSL, JSON files):
+Below is an example to upload example docs (via SSL, JSON and CSV files):
 
     package require solr4tcl
 
@@ -91,19 +92,39 @@ Below is an example to upload example docs (via SSL, JSON files):
         exit
     }
 
-    # setup example docs folder
-    set folder "/home/danilo/Programs/solr-6.0.1/example/exampledocs"
+    # Get current folder
+    set cur_folder [pwd]
 
-    foreach file [glob -directory $folder -types f *.json] {
+    # Enter example docs folder and upload
+    cd "/home/danilo/Programs/solr-6.3.0/example/exampledocs"
+
+    # For json file
+    foreach file [glob -types f *.json] {
         set size [file size $file]
         set fd [open $file {RDWR BINARY}]
         fconfigure $fd -blocking 1 -encoding binary -translation binary
         set data [read $fd $size]
         close $fd
 
+        # Notice: we just give Solr the file name to record
         set res [$solrresquest upload $data $file]
         puts $res
     }
+
+    # For csv file
+    foreach file [glob -types f *.csv] {
+        set size [file size $file]
+        set fd [open $file {RDWR BINARY}]
+        fconfigure $fd -blocking 1 -encoding binary -translation binary
+        set data [read $fd $size]
+        close $fd
+
+        # Notice: we just give Solr the file name to record
+        set res [$solrresquest upload $data $file]
+        puts $res
+    }
+
+    cd $cur_folder
 
     # Commit and Optimize Operations
     set res [$solrresquest commit]
