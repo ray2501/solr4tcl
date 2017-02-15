@@ -116,16 +116,10 @@ oo::class create Solr_Request {
             }
         }
 
-        set ncode [::http::ncode $tok]
         set res [http::status $tok]
         set [namespace current]::response [http::data $tok]
 
         http::cleanup $tok
-
-        if {$ncode != 200} {
-            return "error"
-        }
-
         return $res
     }
 
