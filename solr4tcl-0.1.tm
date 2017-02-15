@@ -116,10 +116,17 @@ oo::class create Solr_Request {
             }
         }
 
+        set ncode [::http::ncode $tok]
         set res [http::status $tok]
         set [namespace current]::response [http::data $tok]
 
         http::cleanup $tok
+
+        # Check status code Unauthorized and Not Found
+        if {$ncode == 401 || $ncode == 404} {
+            return "error"
+        }
+
         return $res
     }
 
