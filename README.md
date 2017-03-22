@@ -2,11 +2,11 @@
 solr4tcl
 =====
 
-A [Tcl] (http://tcl.tk) lightweight client interface to [Apache Solr] (http://lucene.apache.org/solr/).
-The library consists of a single [Tcl Module] (http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file.
+A [Tcl](http://tcl.tk) lightweight client interface to [Apache Solr](http://lucene.apache.org/solr/).
+The library consists of a single [Tcl Module](http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file.
 
 solr4tcl is using  Tcl built-in package http to send request
-to [Aapache Solr] (http://lucene.apache.org/solr/) and get response.
+to [Aapache Solr](http://lucene.apache.org/solr/) and get response.
 
 This library requires package tdom.
 
@@ -197,7 +197,7 @@ If user enables HTTPS support, below is an example:
     
     set solrresquest [Solr_Request new "https://localhost:8984" 1]
 
-Please notice, I use [TLS extension] (http://tls.sourceforge.net/) to add https support. So https support needs TLS extension.
+Please notice, I use [TLS extension](http://tls.sourceforge.net/) to add https support. So https support needs TLS extension.
 
 ## Basic Authentication support
 
