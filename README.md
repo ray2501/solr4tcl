@@ -197,7 +197,8 @@ If user enables HTTPS support, below is an example:
     
     set solrresquest [Solr_Request new "https://localhost:8984" 1]
 
-Please notice, I use [TLS extension](http://tls.sourceforge.net/) to add https support. So https support needs TLS extension.
+Please notice, I use [TLS extension](http://core.tcl.tk/tcltls/index) to add https support.
+So https support needs TLS extension.
 
 ## Basic Authentication support
 
