@@ -28,7 +28,7 @@
 # SUCH DAMAGE.
 #
 
-package require Tcl 8.6
+package require Tcl 8.6-
 package require TclOO
 package require http
 package require tdom

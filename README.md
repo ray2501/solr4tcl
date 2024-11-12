@@ -62,7 +62,7 @@ Below is an example to upload example docs:
     foreach file [glob -directory $folder -types f *.xml] {
         set size [file size $file]
         set fd [open $file {RDWR BINARY}]
-        fconfigure $fd -blocking 1 -encoding binary -translation binary
+        fconfigure $fd -blocking 1 -encoding iso8859-1 -translation binary
         set data [read $fd $size]
         close $fd
 
@@ -102,7 +102,7 @@ Below is an example to upload example docs (via SSL, JSON and CSV files):
     foreach file [glob -types f *.json] {
         set size [file size $file]
         set fd [open $file {RDWR BINARY}]
-        fconfigure $fd -blocking 1 -encoding binary -translation binary
+        fconfigure $fd -blocking 1 -encoding iso8859-1 -translation binary
         set data [read $fd $size]
         close $fd
 
@@ -115,7 +115,7 @@ Below is an example to upload example docs (via SSL, JSON and CSV files):
     foreach file [glob -types f *.csv] {
         set size [file size $file]
         set fd [open $file {RDWR BINARY}]
-        fconfigure $fd -blocking 1 -encoding binary -translation binary
+        fconfigure $fd -blocking 1 -encoding iso8859-1 -translation binary
         set data [read $fd $size]
         close $fd
 
